@@ -7,4 +7,6 @@ public class TodoSqls {
 			"SELECT * FROM todo WHERE id= :id";
 	static final String SELECT_ALL =
 			"SELECT * FROM todo";
+	static final String UPDATE_BY_ID =
+            "UPDATE todo SET todo= :todo, completed= :completed, date= :date  WHERE ID= :id";
 }

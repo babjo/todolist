@@ -3,6 +3,7 @@ package kr.or.connect.todo.persistence;
 import javax.sql.DataSource;
 
 import kr.or.connect.todo.domain.Todo;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -43,10 +44,32 @@ public class TodoDao {
         Map<String, Object> params = new HashMap<>();
         params.put("id", id);
 
-        return jdbc.queryForObject(TodoSqls.SELECT_BY_ID, params, ROW_MAPPER);
+        try {
+            return jdbc.queryForObject(TodoSqls.SELECT_BY_ID, params, ROW_MAPPER);
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
+        }
     }
 
     public List<Todo> selectAll() {
         return jdbc.query(TodoSqls.SELECT_ALL, ROW_MAPPER);
+    }
+
+    public void update(Todo todo) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", todo.getId());
+        params.put("todo", todo.getTodo());
+        params.put("completed", todo.isCompleted());
+        params.put("date", todo.getDate());
+
+
+        jdbc.update(TodoSqls.UPDATE_BY_ID, params);
+    }
+
+    public boolean deleteById(Long id) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
+
+        return jdbc.update(TodoSqls.DELETE_BY_ID, params) == 1;
     }
 }

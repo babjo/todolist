@@ -3,6 +3,7 @@ package kr.or.connect.todo.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import kr.or.connect.todo.domain.Todo;
 import kr.or.connect.todo.dto.CreateTodoDTO;
 import org.junit.*;
 import org.junit.runner.*;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -79,8 +81,8 @@ public class TodoControllerTest {
     @Test
     public void testGetTodos() throws Exception {
         // GIVEN
-        createTodo("Have dinner with my family");
-        createTodo("Have dinner with my friends");
+        requestCreateTodo("Have dinner with my family");
+        requestCreateTodo("Have dinner with my friends");
 
         // WHEN
         mvc.perform(
@@ -97,13 +99,76 @@ public class TodoControllerTest {
                 .andExpect(jsonPath("$[1].date").exists());
     }
 
+    @Test
+    public void testCompleteTodo_todoIdDoesNotExist() throws Exception {
+        // GIVEN
+        long id = -1;
 
-    public void createTodo(String todo) throws Exception {
-        String requestBody = objectMapper.writeValueAsString(new CreateTodoDTO(todo));
+        // WHEN
         mvc.perform(
+                put("/api/todos/" + id)
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                // THEN
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error.message").value("id : doesn't exist"));
+    }
+
+    @Test
+    public void testCompleteTodo_todoIdIsValid() throws Exception {
+        // GIVEN
+        Todo givenTodo = requestCreateTodo("Hang out with my friends");
+        Long id = givenTodo.getId();
+
+        // WHEN
+        mvc.perform(
+                put("/api/todos/" + id)
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                // THEN
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testRemoveTodo_todoIdDoesNotExist() throws Exception {
+        // GIVEN
+        long id = -1;
+
+        // WHEN
+        mvc.perform(
+                delete("/api/todos/" + id)
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                // THEN
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error.message").value("id : doesn't exist"));
+    }
+
+    @Test
+    public void testRemoveTodo_todoIdIsValid() throws Exception {
+        // GIVEN
+        Todo givenTodo = requestCreateTodo("Hang out with my friends");
+        Long id = givenTodo.getId();
+
+        // WHEN
+        mvc.perform(
+                delete("/api/todos/" + id)
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                // THEN
+                .andExpect(status().isOk());
+    }
+
+
+    public Todo requestCreateTodo(String todo) throws Exception {
+        String requestBody = objectMapper.writeValueAsString(new CreateTodoDTO(todo));
+        MvcResult result = mvc.perform(
                 post("/api/todos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
-        );
+        ).andReturn();
+        return objectMapper.readValue(result.getResponse().getContentAsString(), Todo.class);
     }
 }

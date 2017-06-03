@@ -40,5 +40,16 @@ public class TodoController {
         return todoService.findAll();
     }
 
+    @PutMapping("{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void complete(@PathVariable Long id){
+        todoService.complete(id);
+    }
+
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void remove(@PathVariable Long id){
+        todoService.remove(id);
+    }
 
 }

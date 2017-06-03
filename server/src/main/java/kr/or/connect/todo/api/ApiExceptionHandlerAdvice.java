@@ -22,9 +22,16 @@ class ApiExceptionHandlerAdvice {
         BindingResult bindingResult = ex.getBindingResult();
         StringBuilder builder = new StringBuilder();
         List<FieldError> errors = bindingResult.getFieldErrors();
-        for (FieldError error : errors ) {
+        for (FieldError error : errors) {
             builder.append(error.getField() + " : " + error.getDefaultMessage());
         }
         return new ErrorDTO(builder.toString());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorDTO handleIllegalArgumentException(IllegalArgumentException ex) {
+        return new ErrorDTO(ex.getMessage());
     }
 }

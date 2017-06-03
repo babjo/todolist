@@ -32,4 +32,20 @@ public class TodoService {
     public List<Todo> findAll() {
         return todoDao.selectAll();
     }
+
+    public void complete(Long id) {
+        Todo todo = todoDao.selectById(id);
+        if (todo == null){
+            throw new IllegalArgumentException("id : doesn't exist");
+        }
+
+        todo.setCompleted(true);
+        todoDao.update(todo);
+    }
+
+    public void remove(Long id) {
+        if(!todoDao.deleteById(id)){
+            throw new IllegalArgumentException("id : doesn't exist");
+        }
+    }
 }
