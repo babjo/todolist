@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class TodoService {
@@ -28,4 +29,7 @@ public class TodoService {
         return todoDao.selectById(id);
     }
 
+    public List<Todo> findAll() {
+        return todoDao.selectAll();
+    }
 }

@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/todos")
@@ -31,6 +32,12 @@ public class TodoController {
     @ResponseStatus(HttpStatus.CREATED)
     public Todo create(@Valid @RequestBody CreateTodoDTO createTodoDTO) {
         return todoService.create(createTodoDTO.getTodo());
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<Todo> get(){
+        return todoService.findAll();
     }
 
 

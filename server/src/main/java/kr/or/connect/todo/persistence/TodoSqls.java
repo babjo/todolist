@@ -5,4 +5,6 @@ public class TodoSqls {
 			"DELETE FROM todo WHERE id= :id";
 	static final String SELECT_BY_ID =
 			"SELECT * FROM todo WHERE id= :id";
+	static final String SELECT_ALL =
+			"SELECT * FROM todo";
 }

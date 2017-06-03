@@ -1,18 +1,15 @@
 package kr.or.connect.todo.api;
 
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.or.connect.todo.TodoApplication;
+
 import kr.or.connect.todo.dto.CreateTodoDTO;
 import org.junit.*;
 import org.junit.runner.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
@@ -69,8 +66,8 @@ public class TodoControllerTest {
         // WHEN
         mvc.perform(
                 post("/api/todos")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
         )
                 // THEN
                 .andExpect(status().isCreated())
@@ -79,4 +76,34 @@ public class TodoControllerTest {
                 .andExpect(jsonPath("$.date").exists());
     }
 
+    @Test
+    public void testGetTodos() throws Exception {
+        // GIVEN
+        createTodo("Have dinner with my family");
+        createTodo("Have dinner with my friends");
+
+        // WHEN
+        mvc.perform(
+                get("/api/todos")
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                // THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].todo").value("Have dinner with my family"))
+                .andExpect(jsonPath("$[0].completed").value(false))
+                .andExpect(jsonPath("$[0].date").exists())
+                .andExpect(jsonPath("$[1].todo").value("Have dinner with my friends"))
+                .andExpect(jsonPath("$[1].completed").value(false))
+                .andExpect(jsonPath("$[1].date").exists());
+    }
+
+
+    public void createTodo(String todo) throws Exception {
+        String requestBody = objectMapper.writeValueAsString(new CreateTodoDTO(todo));
+        mvc.perform(
+                post("/api/todos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+        );
+    }
 }
