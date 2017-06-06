@@ -82,7 +82,6 @@ public class TodoControllerTest {
     public void testGetTodos() throws Exception {
         // GIVEN
         requestCreateTodo("Have dinner with my family");
-        requestCreateTodo("Have dinner with my friends");
 
         // WHEN
         mvc.perform(
@@ -91,12 +90,9 @@ public class TodoControllerTest {
         )
                 // THEN
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].todo").value("Have dinner with my family"))
-                .andExpect(jsonPath("$[0].completed").value(false))
-                .andExpect(jsonPath("$[0].date").exists())
-                .andExpect(jsonPath("$[1].todo").value("Have dinner with my friends"))
-                .andExpect(jsonPath("$[1].completed").value(false))
-                .andExpect(jsonPath("$[1].date").exists());
+                .andExpect(jsonPath("$[-1:].todo").value("Have dinner with my family"))
+                .andExpect(jsonPath("$[-1:].completed").value(false))
+                .andExpect(jsonPath("$[-1:].date").exists());
     }
 
     @Test
